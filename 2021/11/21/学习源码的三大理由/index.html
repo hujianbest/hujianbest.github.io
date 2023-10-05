@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>学习源码的三大理由 | 胡健的平凡之路</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="阅读源码不仅能够帮你更深刻地理解底层设计原理，提升你的系统架构能力和编码功力，还能让你知道使用中有哪些坑，提前避免。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="学习源码的三大理由">
+<meta property="og:url" content="https://hujianbest.github.io/2021/11/21/%E5%AD%A6%E4%B9%A0%E6%BA%90%E7%A0%81%E7%9A%84%E4%B8%89%E5%A4%A7%E7%90%86%E7%94%B1/index.html">
+<meta property="og:site_name" content="胡健的平凡之路">
+<meta property="og:description" content="阅读源码不仅能够帮你更深刻地理解底层设计原理，提升你的系统架构能力和编码功力，还能让你知道使用中有哪些坑，提前避免。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hujianbest.github.io/images/kafka.jpg">
+<meta property="og:image" content="https://hujianbest.github.io/images/redis.jpg">
+<meta property="article:published_time" content="2021-11-21T10:08:29.000Z">
+<meta property="article:modified_time" content="2023-10-05T14:25:22.511Z">
+<meta property="article:author" content="胡健">
+<meta property="article:tag" content="源码学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hujianbest.github.io/images/kafka.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="胡健的平凡之路" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">胡健的平凡之路</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://hujianbest.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-学习源码的三大理由" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/11/21/%E5%AD%A6%E4%B9%A0%E6%BA%90%E7%A0%81%E7%9A%84%E4%B8%89%E5%A4%A7%E7%90%86%E7%94%B1/" class="article-date">
+  <time class="dt-published" datetime="2021-11-21T10:08:29.000Z" itemprop="datePublished">2021-11-21</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      学习源码的三大理由
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="会用不就行了，为什么要读源码呢？"><a href="#会用不就行了，为什么要读源码呢？" class="headerlink" title="会用不就行了，为什么要读源码呢？"></a>会用不就行了，为什么要读源码呢？</h2><p>平常我们在基于开源框架做应用开发时，可能只是将其作为一个工具或者基础设施来使用，并不会接触到源码层面的东西。比如，Kafka作为消息中间件、Redis作为缓存等。</p>
+<p>其实，在没有阅读源码之前，我也是这么想的。虽然有人说面试会问源码相关的，师兄也告诫我说学习源码能进一步提升你的修为。我觉得他们说的对，但就是无法付诸行动。</p>
+<p>我第一次去看源码，是为了定位生产环境上的问题。使用分布式定时任务时，zookeeper的连接数量达到上限了，导致Job无法启动。后来也陆陆续续通过看源码来解决调试以及生产环境上的问题，自此，我改变的对读源码的看法。</p>
+<h2 id="帮助你快速定位问题"><a href="#帮助你快速定位问题" class="headerlink" title="帮助你快速定位问题"></a>帮助你快速定位问题</h2><p>阅读源码的第一个好处，就是<strong>可以帮你快速定位问题并制定调优方案，减少解决问题的时间成本。</strong></p>
+<p>很多人认为，阅读源码需要花费很多时间，不值得。这是一个非常大的误区。</p>
+<p>实际上，你掌握的源码知识可以很好地指导你日后的实践，帮助你快速地定位问题的原因，迅速找到相应的解决方案。最重要的是，如果你对源码了然于心，你会很清楚线上环境的潜在问题，提前避“坑”。在解决问题时，阅读源码其实是事半功倍的“捷径”。</p>
+<p>如果用时间成本来考量的话，你可以把阅读源码的时间分摊到后续解决各种问题的时间上，你会发现，这本质上是一件划算的事情。</p>
+<h2 id="帮助你更深刻地理解内部设计原理"><a href="#帮助你更深刻地理解内部设计原理" class="headerlink" title="帮助你更深刻地理解内部设计原理"></a>帮助你更深刻地理解内部设计原理</h2><p>阅读源码的第二个好处，就是<strong>可以帮助你更深刻地理解内部设计原理</strong>。</p>
+<p>你可能会问，官网文档也有相应的阐述啊，我单纯阅读文档不就够了吗？</p>
+<p>实际上，有许多很棒的设计理念和特性，常常在文档中并未得到充分的阐述，不过这要因作品而异了。</p>
+<p>当你掌握了某一组件的各种实现细节，建立起对其的全面认识，这样一来你就能成为一名某方面的专家了。当你再遇到问题时，我们就会“条件反射”式地从源码中去寻找答案。</p>
+<h2 id="学习编程规范、设计思想、架构思维"><a href="#学习编程规范、设计思想、架构思维" class="headerlink" title="学习编程规范、设计思想、架构思维"></a>学习编程规范、设计思想、架构思维</h2><p>阅读源码的第三个好处，就是<strong>可以在过程中提升自己，实现职业能力进阶</strong>。</p>
+<p>比如学习业界的编程规范、学习功能模块单元测试的编程方法、包括进一步学习学习计算机系统的关键设计思想。</p>
+<p>一款优秀的源码，它的架构设计有很多为人称道的地方，掌握了这些原理将极大地提升我们自身的系统架构能力和代码功力。</p>
+<p>更进一步，高度掌握源码之后，你还能够加入开源社区，和全世界的源码贡献者协同工作，特别是当你的代码被社区采纳之后，全世界的使用者都会使用你写的代码。这简直太让人兴奋了，不是吗？</p>
+<h2 id="如何阅读源码"><a href="#如何阅读源码" class="headerlink" title="如何阅读源码"></a>如何阅读源码</h2><p>那么问题来了，当你尝试阅读源码的时候，有没有感到无从下手或是无所适从。我最开始无法用下心去读源码，就是没有合适的方法，每次尝试都是浅尝辄止。</p>
+<p>阅读源码的第一个要点，是要<strong>有动力牵引</strong>。你需要有阅读源码的动力来源，是为了解决问题、提升能力，或者为了将来的面试都可以。</p>
+<p>第二个要点，是要<strong>先从整体上掌握源码的结构</strong>。一套源码其代码量从几万到几十万行不等，如果一开始就盯着一个代码文件看，这样就很容易陷入到细节中，一定会“丈二和尚摸不着头脑”。</p>
+<p>所以，我们就需要先形成一幅源码的全景图。比如Kafka的全景图如下：</p>
+<p><img src="/images/kafka.jpg" alt="Kafka全景图"></p>
+<p>Redis的全景图如下：</p>
+<p><img src="/images/redis.jpg" alt="Redis全景图"></p>
+<p>有了全景图以后，我们就可以根据自己的学习需求，查找到所要学习的代码文件。然后，我们再根据不同的功能特性，分线条学习每个功能特性上涉及的关键技术和设计思想。</p>
+<p>第三个要点，就是<strong>要有小目标</strong>。一个开源三方件的功能模块很多，每个功能模块的实现也比较复杂，我们在阅读代码前一定要明确想要了解的目标，比如是想了解某个数据结构，还是想要了解框架的的流程。</p>
+<p>在阅读源码的时候，可能会遇到一些代码看不懂，这些代码的背后往往有一些原理或算法的支撑。这时就需要我们对相应的原理有所了解，这时候可以停下来先去了解原理，然后在回过头来读源码。直接阅读源码，就难于理解代码逻辑，增加了代码阅读的难度。</p>
+<p>第四个要点，是要<strong>分清主次</strong>。读源码并不是要去读每一行代码，虽然说源码是原理的体现，但是和原理相比，源码通常会考虑系统运行时的各种情况和细节。</p>
+<p>如果在阅读源码时，一上来就阅读代码中的每个分支，然后在每个分支上又追到每个函数中细看。而不同分支上的函数往往又涉及其他处理细节，这样一来，就会导致自己既不容易理解代码的主要逻辑，又会感到代码不好读，容易气馁。</p>
+<p>在阅读代码时一定要先把功能模块的主线逻辑梳理出来，具体来说，就是先把代码执行路径了解清楚，其中的分支做好标记，不用一开始就逐行阅读。等主线逻辑清楚后，我们再学习不同分支的处理。</p>
+<p>第五个要点，可以选择<strong>站在前人的肩膀上</strong>。前面提到的全景图、分清主次，往往已有人总结过了，可以选择在这些基础上再去阅读。当然，这点仁者见仁智者见智，自己去摸索出来肯定更有意义，当然也会付出更多的时间。</p>
+<h2 id="哪些源码值得学习"><a href="#哪些源码值得学习" class="headerlink" title="哪些源码值得学习"></a>哪些源码值得学习</h2><p>我觉得有两个出发点去找到要阅读的源码。</p>
+<p>其一是<strong>工作所需</strong>。学习这类源码很容易找到动力，精通这类源码会让你能解决一些棘手问题，获得认可，进而可以得到一些职业上的发展。对于Java后端而言，这类源码就有Spring、Kafka、Tomcat等等。</p>
+<p>其二是<strong>经典</strong>。这类三方件一般在设计上有气独到之处，经常被搬上台面。学习这类源码往往是为了进一步的提升自己，借鉴其中的一些优秀实践。比如Netty、Guava、Redis等。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://hujianbest.github.io/2021/11/21/%E5%AD%A6%E4%B9%A0%E6%BA%90%E7%A0%81%E7%9A%84%E4%B8%89%E5%A4%A7%E7%90%86%E7%94%B1/" data-id="clndag8qr0000to9d3ohcbhgt" data-title="学习源码的三大理由" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/" rel="tag">源码学习</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2021/11/28/Spring%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%80%9D%E8%B7%AF/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          Spring源码学习思路
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2021/06/05/%E7%AE%A1%E7%90%86%E4%BB%A3%E7%A0%81%E4%B8%AD%E7%9A%84%E5%B8%B8%E9%87%8F/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">管理代码中的常量</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9C%B0%E5%9B%BE/" rel="tag">地图</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/" rel="tag">源码学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/" rel="tag">编程实战</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/%E5%9C%B0%E5%9B%BE/" style="font-size: 20px;">地图</a> <a href="/tags/%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/" style="font-size: 20px;">源码学习</a> <a href="/tags/%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/" style="font-size: 10px;">编程实战</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 10px;">设计模式</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/11/">十一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/06/">六月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">四月 2021</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2021/11/28/Spring%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%80%9D%E8%B7%AF/">Spring源码学习思路</a>
+          </li>
+        
+          <li>
+            <a href="/2021/11/21/%E5%AD%A6%E4%B9%A0%E6%BA%90%E7%A0%81%E7%9A%84%E4%B8%89%E5%A4%A7%E7%90%86%E7%94%B1/">学习源码的三大理由</a>
+          </li>
+        
+          <li>
+            <a href="/2021/06/05/%E7%AE%A1%E7%90%86%E4%BB%A3%E7%A0%81%E4%B8%AD%E7%9A%84%E5%B8%B8%E9%87%8F/">管理代码中的常量</a>
+          </li>
+        
+          <li>
+            <a href="/2021/06/05/%E8%B5%B0%E8%BF%91%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%9A%E4%BB%80%E4%B9%88%E6%98%AF%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">走近设计模式：什么是设计模式</a>
+          </li>
+        
+          <li>
+            <a href="/2021/04/24/%E6%88%91%E7%9A%84%E8%AF%BB%E4%B9%A6%E6%B8%85%E5%8D%95/">我的读书清单</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 胡健<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
