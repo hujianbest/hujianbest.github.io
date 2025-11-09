@@ -1,7 +1,7 @@
 # 关于我
 
 <div style="text-align: center; margin-bottom: 2rem;">
-  <img src="https://via.placeholder.com/150?text=Profile" alt="hujianbest" style="width: 150px; height: 150px; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
+  <img src="https://avatars.githubusercontent.com/u/32613761?s=400&u=a4201bb2404debdb4eb1ec70bfd6a521fb640cf5&v=4" alt="hujianbest" style="width: 150px; height: 150px; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
   <h2 style="margin-top: 1rem; color: #42b983;">hujianbest</h2>
   <p style="color: #666; margin-bottom: 1rem;">热爱技术的开发者 | 终身学习者</p>
   <div style="display: flex; justify-content: center; gap: 10px;">
