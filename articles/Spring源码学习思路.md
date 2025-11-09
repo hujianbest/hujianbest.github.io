@@ -13,7 +13,7 @@ description: Spring源码整体结构和其中最值得阅读的部分。
 
 有关Spring框架的介绍可以从[官方文档](https://docs.spring.io/spring-framework/docs/4.0.x/spring-framework-reference/html/overview.html)获得。
 
-Spring 框架由组织成大约 20 个模块的功能组成。这些模块分为Core Container, Data Access/Integration, Web, AOP (Aspect Oriented Programming), Instrumentation, Test。如下图所示![spring-overview](/images/spring-overview.png)
+Spring 框架由组织成大约 20 个模块的功能组成。这些模块分为Core Container, Data Access/Integration, Web, AOP (Aspect Oriented Programming), Instrumentation, Test。如下图所示![spring-overview](../images/spring-overview.png)
 
 ## 核心组成：Core Container
 
