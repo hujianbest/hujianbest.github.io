@@ -2,7 +2,7 @@
 
 > 🎯 记录技术学习、项目经验和生活感悟
 
-![博客Logo](https://via.placeholder.com/120?text=Blog)
+<img src="https://avatars.githubusercontent.com/u/32613761?s=400&u=a4201bb2404debdb4eb1ec70bfd6a521fb640cf5&v=4" alt="博客Logo" style="border-radius: 50%; width: 120px; height: 120px;">
 
 ## 👋 欢迎来到我的个人博客
 
