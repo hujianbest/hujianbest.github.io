@@ -19,7 +19,7 @@
   pip install -r requirements.txt   # 首次需安装 Pillow、geopy
   python generate_photos.py
   ```
-- **说明**：脚本会从照片 EXIF 中读取拍摄时间（DateTimeOriginal）和 GPS；若有 GPS 且已安装 `geopy`，会逆地理编码得到地点名称；无 EXIF 或无 GPS 时，时间用文件修改时间、地点用「未知」。文件名格式为 `地点_YYMMDD_HHMMSS.扩展名`（如 `北京_260223_181642.jpg`）。
+- **说明**：脚本会从照片 EXIF 中读取拍摄时间（DateTimeOriginal）和 GPS；若有 GPS 且已安装 `geopy`，会逆地理编码得到地点名称；无 EXIF 或无 GPS 时，时间用文件修改时间、地点默认为「中国」。文件名格式为 `地点_YYMMDD_HHMMSS.扩展名`（如 `北京_260223_181642.jpg`）。
 - **查看效果**：访问 `/photography/` 即可看到自动生成的瀑布流画廊。
 
 ## 🛠️ 目录结构
@@ -52,3 +52,5 @@ git add .
 git commit -m "Update content"
 git push
 ```
+
+**避免提交信息中文乱码**：在 Windows 下若使用 `git commit -m "中文"` 出现乱码，请将说明写入 UTF-8 编码的文本文件后使用 `git commit -F 文件路径`，或在本仓库已配置 `i18n.commitEncoding=utf-8` 的前提下在终端中设置 UTF-8（如 `chcp 65001`）后再提交。
