@@ -187,6 +187,7 @@
     <script>
         // 摄影作品目录
         const PHOTOS_DIR = 'photos/';
+        const THUMBS_DIR = 'thumbnails/';
         // 允许的图片扩展名
         const EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
 
@@ -214,7 +215,8 @@
                     item.className = 'photo-item';
                     
                     const img = document.createElement('img');
-                    img.src = PHOTOS_DIR + photo.filename;
+                    // 优先加载缩略图
+                    img.src = THUMBS_DIR + (photo.thumbnail || photo.filename);
                     img.alt = photo.title || photo.filename;
                     img.loading = 'lazy';
 
@@ -225,7 +227,8 @@
                     item.appendChild(img);
                     item.appendChild(info);
                     
-                    item.onclick = () => showModal(img.src);
+                    // 点击加载原图
+                    item.onclick = () => showModal(PHOTOS_DIR + photo.filename);
                     
                     gallery.appendChild(item);
                 });

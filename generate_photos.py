@@ -11,8 +11,11 @@ from PIL.ExifTags import TAGS
 
 # 配置
 PHOTOS_DIR = 'photography/photos'
+THUMBNAILS_DIR = 'photography/thumbnails'
 OUTPUT_JSON = 'photography/photos.json'
 EXTENSIONS = ('.jpg', '.jpeg', '.png', '.webp', '.gif')
+# 缩略图最大宽度
+THUMB_WIDTH = 800
 # 文件名非法字符（Windows/通用）
 INVALID_CHARS = r'[\\/:*?"<>|\s]+'
 # 无地点时使用的名称（未提取到地理位置信息时的默认值）
@@ -143,10 +146,33 @@ def build_new_basename(path, exif, use_geocode, geocode_cache):
     return f"{place}_{time_str}", dt
 
 
+def create_thumbnail(src_path, thumb_path):
+    """生成缩略图。"""
+    try:
+        with Image.open(src_path) as img:
+            # 保持比例缩小
+            w, h = img.size
+            if w > THUMB_WIDTH:
+                ratio = THUMB_WIDTH / float(w)
+                new_h = int(float(h) * ratio)
+                img = img.resize((THUMB_WIDTH, new_h), Image.Resampling.LANCZOS)
+            # 转换为 RGB 以支持保存为 JPEG (处理带有 Alpha 通道的图片)
+            if img.mode in ("RGBA", "P"):
+                img = img.convert("RGB")
+            img.save(thumb_path, "JPEG", quality=85)
+            return True
+    except Exception as e:
+        print(f"生成缩略图失败 {src_path}: {e}")
+        return False
+
+
 def main():
     if not os.path.exists(PHOTOS_DIR):
         print(f"错误: 目录 {PHOTOS_DIR} 不存在")
         return
+
+    if not os.path.exists(THUMBNAILS_DIR):
+        os.makedirs(THUMBNAILS_DIR)
 
     use_geocode = True
     try:
@@ -193,11 +219,18 @@ def main():
         if temp_p is not None:
             os.rename(temp_p, new_p)
 
-    # 生成 photos.json
+    # 生成 photos.json 和缩略图
     photos = []
-    for _, _, _, new_name, dt in temp_list:
+    for _, temp_p, new_path, new_name, dt in temp_list:
+        thumb_name = os.path.splitext(new_name)[0] + ".jpg"
+        thumb_path = os.path.join(THUMBNAILS_DIR, thumb_name)
+        
+        # 即使缩略图已存在也重新生成，以确保更新
+        create_thumbnail(new_path, thumb_path)
+        
         photos.append({
             "filename": new_name,
+            "thumbnail": thumb_name,
             "title": os.path.splitext(new_name)[0],
             "date": dt.strftime("%Y-%m-%d"),
         })
@@ -205,7 +238,7 @@ def main():
     with open(OUTPUT_JSON, 'w', encoding='utf-8') as f:
         json.dump(photos, f, ensure_ascii=False, indent=4)
 
-    print(f"成功: 已重命名 {len(renames)} 张图片并生成 {OUTPUT_JSON}")
+    print(f"成功: 已重命名 {len(renames)} 张图片，生成缩略图并更新 {OUTPUT_JSON}")
 
 
 if __name__ == "__main__":
