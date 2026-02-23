@@ -15,8 +15,8 @@ OUTPUT_JSON = 'photography/photos.json'
 EXTENSIONS = ('.jpg', '.jpeg', '.png', '.webp', '.gif')
 # 文件名非法字符（Windows/通用）
 INVALID_CHARS = r'[\\/:*?"<>|\s]+'
-# 无地点时使用的名称
-UNKNOWN_PLACE = "未知"
+# 无地点时使用的名称（未提取到地理位置信息时的默认值）
+UNKNOWN_PLACE = "中国"
 # Nominatim 限速：约 1 次/秒
 GEOCODE_DELAY = 1.1
 
@@ -152,7 +152,7 @@ def main():
     try:
         from geopy.geocoders import Nominatim
     except ImportError:
-        print("提示: 未安装 geopy，地点将使用坐标或「未知」。安装: pip install geopy")
+        print("提示: 未安装 geopy，地点将使用坐标或「中国」。安装: pip install geopy")
         use_geocode = False
 
     geocode_cache = {}
