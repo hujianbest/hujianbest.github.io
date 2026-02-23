@@ -14,10 +14,12 @@
 摄影系统支持自动化发布，存放在 `photography/` 目录下。
 
 - **发布作品**：将照片文件（jpg/png/webp 等）放入 `photography/photos/` 目录。
-- **更新列表**：运行根目录下的脚本生成索引文件：
+- **更新列表与重命名**：在项目根目录运行脚本（会从 EXIF 读取拍摄时间与地点，并将照片重命名为「地点_时间」格式，再生成索引）：
   ```bash
+  pip install -r requirements.txt   # 首次需安装 Pillow、geopy
   python generate_photos.py
   ```
+- **说明**：脚本会从照片 EXIF 中读取拍摄时间（DateTimeOriginal）和 GPS；若有 GPS 且已安装 `geopy`，会逆地理编码得到地点名称；无 EXIF 或无 GPS 时，时间用文件修改时间、地点用「未知」。文件名格式为 `地点_YYMMDD_HHMMSS.扩展名`（如 `北京_260223_181642.jpg`）。
 - **查看效果**：访问 `/photography/` 即可看到自动生成的瀑布流画廊。
 
 ## 🛠️ 目录结构
@@ -33,7 +35,8 @@
 │   ├── index.html          # 画廊页面
 │   ├── photos.json         # 自动生成的图片索引
 │   └── photos/             # 摄影作品原图存放处
-└── generate_photos.py      # 摄影作品索引生成脚本
+├── generate_photos.py      # 摄影作品索引与重命名脚本（EXIF 时间+地点）
+└── requirements.txt       # Python 依赖（Pillow、geopy）
 ```
 
 ## 🎨 设计风格
