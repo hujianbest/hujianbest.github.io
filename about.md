@@ -9,12 +9,12 @@
       <span style="background: #f5f5f5; padding: 5px 10px; border-radius: 4px; font-size: 0.9rem;">
         GitHub
       </span>
-    >
+    </a>
     <a href="https://hujianbest.github.io" target="_blank" style="color: #333; text-decoration: none;">
       <span style="background: #f5f5f5; padding: 5px 10px; border-radius: 4px; font-size: 0.9rem;">
         博客
       </span>
-    >
+    </a>
   </div>
 </div>
 
