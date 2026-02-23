@@ -1,461 +1,221 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>hujianbest的平凡之路</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <meta name="description" content="hujianbest的个人技术博客，记录技术学习、项目经验和生活感悟">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-  <meta name="theme-color" content="#42b983">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/prismjs/themes/prism-tomorrow.min.css">
-  <style>
-    /* 自定义样式 */
-    :root {
-      --theme-color: #42b983;
-      --sidebar-width: 300px;
-      --bg-color: #f4f6fb;
-      --card-bg: #ffffff;
-      --text-color: #222222;
-      --text-secondary: #666666;
-      --border-radius-lg: 16px;
-      --border-radius-md: 10px;
-      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.12);
-      --shadow-card: 0 10px 30px rgba(15, 23, 42, 0.08);
-      --transition-fast: 0.2s ease-out;
-      --transition-normal: 0.3s ease;
-      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-        "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
-        "Helvetica Neue", Arial, sans-serif;
-    }
-    
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: var(--font-sans);
-      background: radial-gradient(circle at top left, #ecfdf5 0, #eef2ff 45%, #f9fafb 100%);
-      color: var(--text-color);
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-    
-    /* 顶部导航 / 站点标题 */
-    .app-nav {
-      backdrop-filter: blur(16px);
-      background: rgba(255, 255, 255, 0.85) !important;
-      box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04);
-    }
-    
-    .app-name {
-      font-weight: 700 !important;
-      letter-spacing: 0.03em;
-    }
-    
-    .app-nav .search input {
-      border-radius: 999px !important;
-      border: 1px solid rgba(148, 163, 184, 0.5) !important;
-      background: rgba(255, 255, 255, 0.9) !important;
-      padding-inline: 14px !important;
-      transition: border-color var(--transition-fast), box-shadow var(--transition-fast),
-        background var(--transition-fast);
-    }
-    
-    .app-nav .search input:focus {
-      border-color: var(--theme-color) !important;
-      box-shadow: 0 0 0 1px rgba(66, 185, 131, 0.15);
-      background: #ffffff !important;
-      outline: none;
-    }
-    
-    /* 侧边栏样式优化 */
-    .sidebar {
-      width: var(--sidebar-width);
-      background: radial-gradient(circle at top, #ecfdf5 0, #e5f3ff 40%, #eef2ff 100%);
-      border-right: 1px solid rgba(148, 163, 184, 0.25);
-      box-shadow: 8px 0 30px rgba(15, 23, 42, 0.08);
-    }
-    
-    .sidebar .app-name {
-      padding-top: 1.5rem;
-      padding-bottom: 0.5rem;
-      font-size: 1.2rem;
-    }
-    
-    .sidebar-nav {
-      padding: 0.75rem 1.2rem 2.5rem;
-    }
-    
-    .sidebar-nav a {
-      border-radius: 999px;
-      padding: 0.45rem 0.9rem;
-      margin: 0.1rem 0;
-      color: #475569;
-      transition: background var(--transition-fast), color var(--transition-fast),
-        transform var(--transition-fast), box-shadow var(--transition-fast);
-    }
-    
-    .sidebar-nav a:hover {
-      background: rgba(255, 255, 255, 0.9);
-      color: #0f172a;
-      transform: translateX(2px);
-      box-shadow: 0 4px 12px rgba(148, 163, 184, 0.4);
-    }
-    
-    .sidebar-nav a.router-link-active {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      color: #ecfdf5;
-      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.55);
-      font-weight: 600;
-    }
-    
-    .sidebar-toggle {
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.7);
-      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.6);
-    }
-    
-    .sidebar-toggle span {
-      background-color: #e5e7eb;
-    }
-    
-    /* 内容区域卡片化 */
-    .content {
-      padding: 3rem 1.5rem 3.5rem;
-    }
-    
-    .markdown-section {
-      max-width: 960px;
-      padding: 2.4rem 3rem 2.8rem;
-      margin: 1.2rem auto 0;
-      background: var(--card-bg);
-      border-radius: var(--border-radius-lg);
-      box-shadow: var(--shadow-soft);
-      border: 1px solid rgba(226, 232, 240, 0.8);
-      line-height: 1.7;
-      color: var(--text-color);
-    }
-    
-    @media screen and (max-width: 960px) {
-      .content {
-        padding: 2.2rem 1.2rem 2.8rem;
-      }
-      
-      .markdown-section {
-        margin-top: 0.5rem;
-        padding: 1.6rem 1.4rem 2rem;
-        border-radius: var(--border-radius-md);
-        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.14);
-      }
-    }
-    
-    @media screen and (max-width: 768px) {
-      .sidebar {
-        box-shadow: 6px 0 24px rgba(15, 23, 42, 0.5);
-      }
-    }
-    
-    /* 文章排版优化 */
-    .markdown-section h1,
-    .markdown-section h2,
-    .markdown-section h3,
-    .markdown-section h4 {
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      color: #0f172a;
-      scroll-margin-top: 80px;
-    }
-    
-    .markdown-section h1 {
-      font-size: 2rem;
-      margin-bottom: 1.2rem;
-      position: relative;
-    }
-    
-    .markdown-section h1::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: -0.5rem;
-      width: 54px;
-      height: 3px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #22c55e, #0ea5e9);
-    }
-    
-    .markdown-section h2 {
-      font-size: 1.55rem;
-      margin-top: 1.8rem;
-      margin-bottom: 0.75rem;
-    }
-    
-    .markdown-section h3 {
-      font-size: 1.25rem;
-      margin-top: 1.5rem;
-      margin-bottom: 0.5rem;
-    }
-    
-    .markdown-section p {
-      color: var(--text-secondary);
-      margin: 0.6rem 0 0.8rem;
-    }
-    
-    .markdown-section ul,
-    .markdown-section ol {
-      margin: 0.3rem 0 0.9rem;
-      padding-left: 1.2rem;
-    }
-    
-    .markdown-section li + li {
-      margin-top: 0.2rem;
-    }
-    
-    .markdown-section a {
-      color: #059669;
-      font-weight: 500;
-      text-decoration: none;
-      border-bottom: 1px dashed rgba(34, 197, 94, 0.4);
-      transition: color var(--transition-fast), border-color var(--transition-fast),
-        background var(--transition-fast);
-    }
-    
-    .markdown-section a:hover {
-      color: #047857;
-      border-color: transparent;
-      background: rgba(187, 247, 208, 0.4);
-      box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.12);
-    }
-    
-    .markdown-section blockquote {
-      border-left: 4px solid rgba(16, 185, 129, 0.8);
-      background: linear-gradient(135deg, rgba(209, 250, 229, 0.7), rgba(224, 242, 254, 0.9));
-      border-radius: 0 14px 14px 0;
-      padding: 0.85rem 1.1rem;
-      color: #0f172a;
-      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
-      margin: 1rem 0 1.2rem;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .markdown-section blockquote::before {
-      content: "“";
-      position: absolute;
-      right: 1.2rem;
-      top: -1rem;
-      font-size: 3.6rem;
-      color: rgba(34, 197, 94, 0.2);
-      font-family: Georgia, "Times New Roman", serif;
-    }
-    
-    .markdown-section code {
-      font-size: 0.88em;
-      border-radius: 6px;
-      padding: 0.14rem 0.4rem;
-      background: rgba(15, 23, 42, 0.06);
-      color: #0f172a;
-    }
-    
-    /* 文章卡片样式 */
-    .article-card {
-      background: #fff;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      transition: all 0.3s ease;
-    }
-    
-    .article-card:hover {
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-      transform: translateY(-2px);
-    }
-    
-    .article-card h3 {
-      margin-top: 0;
-      margin-bottom: 10px;
-      font-size: 1.4rem;
-    }
-    
-    .article-card time {
-      color: #888;
-      font-size: 0.9rem;
-      display: block;
-      margin-bottom: 10px;
-    }
-    
-    .article-card p {
-      color: #555;
-      margin-bottom: 0;
-    }
-    
-    /* 代码块样式优化 */
-    .markdown-section pre {
-      border-radius: 10px;
-      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.45);
-      overflow: auto;
-    }
-    
-    .markdown-section pre > code {
-      border-radius: 10px;
-      font-size: 0.9rem;
-    }
-    
-    /* 首页封面优化 */
-    .cover-main {
-      text-align: left;
-      max-width: 640px;
-      padding: 2.8rem 3.2rem 3.2rem;
-      border-radius: var(--border-radius-lg);
-      background: radial-gradient(circle at top left, #ecfdf5 0, #ffffff 40%, #eef2ff 100%);
-      box-shadow: var(--shadow-soft);
-      border: 1px solid rgba(226, 232, 240, 0.9);
-    }
-    
-    .cover-main h1 {
-      font-size: 2.2rem;
-      margin-bottom: 0.75rem;
-      letter-spacing: 0.04em;
-    }
-    
-    .cover-main blockquote {
-      margin-top: 0.4rem;
-      margin-bottom: 1.1rem;
-      background: transparent;
-      box-shadow: none;
-    }
-    
-    .cover-main .buttons a {
-      border-radius: 999px !important;
-      padding-inline: 1.6rem !important;
-      padding-block: 0.7rem !important;
-      box-shadow: 0 14px 30px rgba(34, 197, 94, 0.6);
-      border: none !important;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      text-transform: none;
-    }
-    
-    .cover-main .buttons a:nth-child(2) {
-      background: #f9fafb !important;
-      color: #0f172a !important;
-      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
-    }
-    
-    /* 页脚小提示 */
-    .footer {
-      max-width: 960px;
-      margin: 1.5rem auto 0;
-      padding: 0.6rem 0 1.4rem;
-      font-size: 0.8rem;
-      color: #94a3b8;
-      text-align: center;
-    }
-    
-    .footer a {
-      color: #22c55e;
-      text-decoration: none;
-    }
-    
-    /* 进度条样式 */
-    .progress {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 0%;
-      height: 3px;
-      background: linear-gradient(90deg, #22c55e, #0ea5e9, #a855f7);
-      z-index: 9999;
-      box-shadow: 0 0 18px rgba(56, 189, 248, 0.7);
-      transform-origin: left center;
-      transition: width 0.2s ease-out;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hujianbest的个人空间</title>
+    <style>
+        :root {
+            --apple-bg: #f5f5f7;
+            --apple-text: #1d1d1f;
+            --apple-card-bg: rgba(255, 255, 255, 0.8);
+            --apple-blur: blur(20px);
+            --transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--apple-bg);
+            color: var(--apple-text);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: radial-gradient(circle at center, #ffffff 0%, #f5f5f7 100%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 40px;
+            text-align: center;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 600;
+            letter-spacing: -0.015em;
+            margin-bottom: 16px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s forwards;
+        }
+
+        p.subtitle {
+            font-size: 24px;
+            color: #86868b;
+            margin-bottom: 60px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s 0.2s forwards;
+        }
+
+        .cards {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        .card {
+            background: var(--apple-card-bg);
+            backdrop-filter: var(--apple-blur);
+            -webkit-backdrop-filter: var(--apple-blur);
+            width: 400px;
+            height: 500px;
+            border-radius: 30px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
+            transition: var(--transition);
+            opacity: 0;
+            transform: translateY(30px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:nth-child(1) { animation: fadeInUp 0.8s 0.4s forwards; }
+        .card:nth-child(2) { animation: fadeInUp 0.8s 0.6s forwards; }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .card-content {
+            text-align: left;
+            z-index: 2;
+        }
+
+        .card-tag {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #86868b;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .card-title {
+            font-size: 32px;
+            font-weight: 600;
+            line-height: 1.1;
+            margin-bottom: 15px;
+        }
+
+        .card-desc {
+            font-size: 17px;
+            color: #86868b;
+            line-height: 1.47;
+        }
+
+        .card-footer {
+            text-align: left;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #0066cc;
+            z-index: 2;
+        }
+
+        .card-footer svg {
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover .card-footer svg {
+            transform: translateX(3px);
+        }
+
+        /* Background elements */
+        .bg-blob {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(66, 185, 131, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            z-index: 0;
+            filter: blur(50px);
+        }
+
+        .blob-1 { top: -200px; left: -200px; }
+        .blob-2 { bottom: -200px; right: -200px; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .cards {
+                flex-direction: column;
+                align-items: center;
+            }
+            .card {
+                width: 100%;
+                max-width: 400px;
+                height: 400px;
+            }
+            body {
+                overflow: auto;
+            }
+        }
+    </style>
 </head>
 <body>
-  <!-- 阅读进度条 -->
-  <div class="progress"></div>
-  
-  <div id="app"></div>
-  <div class="footer">
-    用心记录每一次成长 · Powered by Docsify &amp; GitHub Pages
-  </div>
-  <script>
-    window.$docsify = {
-      name: 'hujianbest的平凡之路',
-      repo: 'hujianbest/hujianbest.github.io',
-      loadSidebar: true,
-      loadNavbar: true,
-      subMaxLevel: 3,
-      auto2top: true,
-      homepage: 'README.md',
-      coverpage: true,
-      onlyCover: false,
-      coverpageButton: '开始阅读',
-      auto2top: true,
-      search: {
-        maxAge: 86400000,
-        paths: 'auto',
-        placeholder: '搜索',
-        noData: '没有找到结果',
-        depth: 6
-      },
-      pagination: {
-        previousText: '上一章节',
-        nextText: '下一章节',
-      },
-      copyCode: {
-        buttonText : '复制',
-        errorText  : '错误',
-        successText: '已复制'
-      },
-      // 页面加载动画
-      themeColor: '#42b983',
-      // 代码高亮配置
-      highlight: {
-        auto: true,
-        tab: '  '
-      },
-      // 图片放大配置
-      zoomImage: {
-        imgSelection: true,
-        delay: 300
-      }
-    }
-  </script>
-  
-  <!-- Docsify v4 -->
-  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
-  
-  <!-- 插件 -->
-  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-count/dist/countable.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
-  
-  <!-- 代码高亮支持 -->
-  <script src="//cdn.jsdelivr.net/npm/prismjs/components/prism-bash.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs/components/prism-javascript.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs/components/prism-typescript.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs/components/prism-css.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs/components/prism-python.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs/components/prism-java.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs/components/prism-json.min.js"></script>
-  
-  <!-- 阅读进度条脚本 -->
-  <script>
-    window.onscroll = function() {
-      var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-      var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      var scrolled = (winScroll / height) * 100;
-      document.querySelector(".progress").style.width = scrolled + "%";
-    };
-    
-    // 页面加载完成后初始化
-    document.addEventListener('DOMContentLoaded', function() {
-      // 可以在这里添加更多自定义功能
-    });
-  </script>
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+
+    <div class="container">
+        <h1>hujianbest</h1>
+        <p class="subtitle">平凡之路，光影随行</p>
+
+        <div class="cards">
+            <a href="/blog/" class="card">
+                <div class="card-content">
+                    <span class="card-tag">Blog</span>
+                    <h2 class="card-title">文字记录</h2>
+                    <p class="card-desc">记录技术学习、项目经验和生活感悟。在代码的世界里寻找诗意。</p>
+                </div>
+                <div class="card-footer">
+                    阅读更多
+                    <svg width="7" height="11" viewBox="0 0 7 11" fill="none">
+                        <path d="M1 1L5.5 5.5L1 10" stroke="#0066cc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </a>
+
+            <a href="/photography/" class="card">
+                <div class="card-content">
+                    <span class="card-tag">Photography</span>
+                    <h2 class="card-title">光影瞬间</h2>
+                    <p class="card-desc">捕捉生活中的美好瞬间。用镜头记录这个世界的温度与色彩。</p>
+                </div>
+                <div class="card-footer">
+                    进入画廊
+                    <svg width="7" height="11" viewBox="0 0 7 11" fill="none">
+                        <path d="M1 1L5.5 5.5L1 10" stroke="#0066cc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </a>
+        </div>
+    </div>
 </body>
 </html>
