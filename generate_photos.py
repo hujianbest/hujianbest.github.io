@@ -6,7 +6,7 @@ import os
 import re
 import json
 from datetime import datetime
-from PIL import Image
+from PIL import Image, ImageOps
 from PIL.ExifTags import TAGS
 
 # 配置
@@ -150,6 +150,8 @@ def create_thumbnail(src_path, thumb_path):
     """生成缩略图。"""
     try:
         with Image.open(src_path) as img:
+            # 自动处理 EXIF 旋转方向
+            img = ImageOps.exif_transpose(img)
             # 保持比例缩小
             w, h = img.size
             if w > THUMB_WIDTH:
