@@ -107,6 +107,10 @@
       width: 100%; padding: 8px 10px; margin-bottom: 12px; border-radius: 8px;
       border: 1px solid var(--border); font-size: 13px;
     }
+    .drawer input.field-error {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 1px rgba(255, 59, 48, 0.15);
+    }
     .drawer .field-row { display: flex; gap: 10px; }
     .drawer .field-row > div { flex: 1; }
     .drawer .tiny { font-size: 11px; color: var(--secondary); margin-top: 2px; margin-bottom: 8px; }
@@ -216,6 +220,12 @@
       drawerOverlay: document.getElementById("drawer-overlay"),
       openDrawer: document.getElementById("open-drawer"),
     };
+
+    function markFieldError(el, hasError) {
+      if (!el) return;
+      if (hasError) el.classList.add("field-error");
+      else el.classList.remove("field-error");
+    }
 
     function openDrawer() { els.drawer.classList.add("open"); els.drawerOverlay.classList.add("open"); }
     function closeDrawer() { els.drawer.classList.remove("open"); els.drawerOverlay.classList.remove("open"); }
@@ -367,9 +377,32 @@
     function collectImageTargets() { return selectedImages.map((file) => ({ file, name: file.name, targetPath: "blog/images/" + file.name })); }
 
     async function handlePublish() {
-      const owner = els.owner.value.trim(), repo = els.repo.value.trim(), branch = els.branch.value.trim(), title = els.title.value.trim();
-      if (!owner || !repo || !branch) { els.publishStatus.textContent = "请填写仓库 Owner、Repo、分支。"; els.publishStatus.className = "status error"; return; }
-      if (!title) { els.publishStatus.textContent = "请填写文章标题。"; els.publishStatus.className = "status error"; return; }
+      const token = els.token.value.trim();
+      const owner = els.owner.value.trim();
+      const repo = els.repo.value.trim();
+      const branch = els.branch.value.trim();
+      const title = els.title.value.trim();
+
+      // 清理上一次的错误状态
+      els.publishStatus.textContent = "";
+      els.publishStatus.className = "status";
+      [els.token, els.owner, els.repo, els.branch, els.title].forEach((el) => markFieldError(el, false));
+
+      const missing = [];
+      if (!token) { missing.push("GitHub Token"); markFieldError(els.token, true); }
+      if (!owner) { missing.push("Owner"); markFieldError(els.owner, true); }
+      if (!repo) { missing.push("Repo"); markFieldError(els.repo, true); }
+      if (!branch) { missing.push("分支"); markFieldError(els.branch, true); }
+      if (!title) { missing.push("文章标题"); markFieldError(els.title, true); }
+
+      if (missing.length) {
+        els.publishStatus.textContent = "请先填写：" + missing.join("、") + "。";
+        els.publishStatus.className = "status error";
+        // 自动展开设置面板，方便用户看到标红字段
+        openDrawer();
+        return;
+      }
+
       const frontMatter = buildFrontMatter();
       const body = easyMDE.value() || "";
       const fullContent = frontMatter + body;
