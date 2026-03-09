@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>写作后台 · hujianbest 技术博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="在浏览器中直接撰写 Markdown，并通过 GitHub API 发布到 blog/articles 和 blog/images。"
+  />
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --panel-bg: rgba(255, 255, 255, 0.9);
+      --border: rgba(0, 0, 0, 0.05);
+      --text: #1d1d1f;
+      --secondary: #8e8e93;
+      --accent: #0066cc;
+      --danger: #ff3b30;
+      --success: #34c759;
+      --radius-lg: 24px;
+      --radius-md: 14px;
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.16);
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: radial-gradient(circle at top, #ffffff 0, #f5f5f7 55%, #e5e5ea 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 20px 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .logo span {
+      margin-left: 8px;
+      font-size: 13px;
+      color: var(--secondary);
+      font-weight: 500;
+    }
+
+    header nav a {
+      font-size: 13px;
+      color: var(--secondary);
+      text-decoration: none;
+      margin-left: 16px;
+      transition: color var(--transition);
+    }
+
+    header nav a:hover {
+      color: var(--accent);
+    }
+
+    .hero {
+      margin-bottom: 20px;
+    }
+
+    .hero-title {
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .hero-desc {
+      font-size: 14px;
+      color: var(--secondary);
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--secondary);
+      margin-top: 6px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 260px) minmax(0, 1.2fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .panel {
+      background: var(--panel-bg);
+      border-radius: var(--radius-lg);
+      padding: 18px 18px 16px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .panel h2 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--secondary);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    textarea {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      padding: 8px 10px;
+      font-size: 13px;
+      font-family: var(--font-sans);
+      background: rgba(255, 255, 255, 0.85);
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition),
+        background var(--transition);
+    }
+
+    textarea {
+      min-height: 200px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(0, 102, 204, 0.16);
+      background: #ffffff;
+    }
+
+    .field-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .field-row > div {
+      flex: 1;
+    }
+
+    .token-input {
+      font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+    }
+
+    .tiny {
+      font-size: 11px;
+      color: var(--secondary);
+      margin-top: 2px;
+    }
+
+    .status {
+      font-size: 12px;
+      margin-top: 4px;
+      min-height: 18px;
+    }
+
+    .status.ok {
+      color: var(--success);
+    }
+
+    .status.error {
+      color: var(--danger);
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 8px 16px;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background var(--transition), box-shadow var(--transition),
+        transform var(--transition), opacity var(--transition);
+    }
+
+    button.primary {
+      background: #000;
+      color: #fff;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    button.secondary {
+      background: rgba(0, 0, 0, 0.06);
+      color: var(--text);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+    }
+
+    .preview {
+      border-radius: var(--radius-md);
+      background: #f9fafb;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--secondary);
+      overflow: auto;
+      flex: 1;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .preview h1,
+    .preview h2,
+    .preview h3 {
+      margin: 8px 0 4px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .preview p {
+      margin: 4px 0;
+    }
+
+    .preview code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      font-size: 11px;
+      background: rgba(0, 0, 0, 0.04);
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+
+    .preview img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+
+    .images-list {
+      font-size: 12px;
+      max-height: 140px;
+      overflow: auto;
+      margin-top: 4px;
+    }
+
+    .images-list div {
+      margin-bottom: 4px;
+    }
+
+    .code-inline {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      font-size: 11px;
+      background: rgba(0, 0, 0, 0.04);
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+
+    @media (max-width: 1100px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-rows: auto auto;
+      }
+
+      .panel:nth-child(1) {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 800px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="logo">
+        hujianbest
+        <span>Writing Studio</span>
+      </div>
+      <nav>
+        <a href="/">返回首页</a>
+        <a href="/blog/">查看博客</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1 class="hero-title">在线写一篇新的博客。</h1>
+      <p class="hero-desc">
+        在这里撰写 Markdown，点击发布后将通过 GitHub API 自动写入
+        <span class="code-inline">blog/articles</span> 和
+        <span class="code-inline">blog/images</span> 目录。
+      </p>
+      <p class="hint">
+        提示：Access Token 仅保存在当前浏览器的 localStorage 中，请使用只对本仓库有写权限的最小权限 Token。
+      </p>
+    </section>
+
+    <section class="layout">
+      <div class="panel" id="config-panel">
+        <h2>仓库配置与文章信息</h2>
+
+        <div>
+          <label for="token">GitHub Personal Access Token</label>
+          <input
+            id="token"
+            type="text"
+            class="token-input"
+            placeholder="ghp_xxx 或 fine-grained token"
+          />
+          <div class="tiny">
+            仅保存在浏览器本地，不会上传到任何服务器。建议为
+            <span class="code-inline">hujianbest/hujianbest.github.io</span>
+            创建仅限此仓库的细粒度 Token。
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div>
+            <label for="owner">仓库 Owner</label>
+            <input id="owner" type="text" />
+          </div>
+          <div>
+            <label for="repo">仓库名</label>
+            <input id="repo" type="text" />
+          </div>
+        </div>
+
+        <div>
+          <label for="branch">分支</label>
+          <input id="branch" type="text" />
+          <div class="tiny">通常为 <span class="code-inline">main</span> 或 <span class="code-inline">master</span>。</div>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid var(--border); margin: 4px 0 6px" />
+
+        <div>
+          <label for="title">文章标题</label>
+          <input id="title" type="text" placeholder="例如：架构设计心得" />
+        </div>
+
+        <div class="field-row">
+          <div>
+            <label for="slug">文件名（含扩展名，可留空自动生成）</label>
+            <input id="slug" type="text" placeholder="例如：架构设计心得.md" />
+            <div class="tiny">
+              实际路径为 <span class="code-inline">blog/articles/&lt;文件名&gt;</span>。
+            </div>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div>
+            <label for="date">发布日期</label>
+            <input id="date" type="date" />
+          </div>
+          <div>
+            <label for="tags">标签（逗号分隔）</label>
+            <input id="tags" type="text" placeholder="架构, 源码, 实践" />
+          </div>
+        </div>
+
+        <div>
+          <label for="category">分类</label>
+          <input id="category" type="text" placeholder="例如：架构设计 / 源码阅读 / 工程实践" />
+        </div>
+
+        <div class="actions">
+          <button type="button" class="secondary" id="save-config">保存配置到本地</button>
+        </div>
+
+        <div class="status" id="config-status"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Markdown 正文</h2>
+        <label for="content">支持标准 Markdown 语法。</label>
+        <textarea id="content" placeholder="在这里开始写作……"></textarea>
+        <div class="tiny">
+          发布时会自动在文首添加一个包含标题、日期、标签的 Front Matter。
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>预览与图片</h2>
+
+        <div>
+          <label for="image-input">文章图片（可多选）</label>
+          <input id="image-input" type="file" accept="image/*" multiple />
+          <div class="tiny">
+            图片会上传到 <span class="code-inline">blog/images</span> 目录，你可以在文中引用
+            <span class="code-inline">![](../images/文件名)</span>。
+          </div>
+          <div class="images-list" id="images-list"></div>
+        </div>
+
+        <div>
+          <label>文章预览（简单渲染）</label>
+          <div class="preview" id="preview"></div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="secondary" id="preview-frontmatter">
+            预览 Front Matter
+          </button>
+          <button type="button" class="primary" id="publish-btn">
+            发布到 GitHub
+          </button>
+        </div>
+
+        <div class="status" id="publish-status"></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const els = {
+      token: document.getElementById("token"),
+      owner: document.getElementById("owner"),
+      repo: document.getElementById("repo"),
+      branch: document.getElementById("branch"),
+      title: document.getElementById("title"),
+      slug: document.getElementById("slug"),
+      date: document.getElementById("date"),
+      tags: document.getElementById("tags"),
+      category: document.getElementById("category"),
+      content: document.getElementById("content"),
+      imageInput: document.getElementById("image-input"),
+      imagesList: document.getElementById("images-list"),
+      preview: document.getElementById("preview"),
+      saveConfig: document.getElementById("save-config"),
+      configStatus: document.getElementById("config-status"),
+      publishBtn: document.getElementById("publish-btn"),
+      previewFrontmatter: document.getElementById("preview-frontmatter"),
+      publishStatus: document.getElementById("publish-status"),
+    };
+
+    const STORAGE_KEY = "hjb_blog_admin_config_v1";
+    const DEFAULT_CONFIG = {
+      owner: "hujianbest",
+      repo: "hujianbest.github.io",
+      branch: "main",
+    };
+
+    let selectedImages = [];
+
+    function loadConfig() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          els.owner.value = DEFAULT_CONFIG.owner;
+          els.repo.value = DEFAULT_CONFIG.repo;
+          els.branch.value = DEFAULT_CONFIG.branch;
+          // 默认日期设为今天
+          els.date.value = new Date().toISOString().slice(0, 10);
+          return;
+        }
+        const cfg = JSON.parse(raw);
+        els.token.value = cfg.token || "";
+        els.owner.value = cfg.owner || DEFAULT_CONFIG.owner;
+        els.repo.value = cfg.repo || DEFAULT_CONFIG.repo;
+        els.branch.value = cfg.branch || DEFAULT_CONFIG.branch;
+        els.date.value = cfg.date || new Date().toISOString().slice(0, 10);
+        els.tags.value = cfg.tags || "";
+      } catch (e) {
+        console.warn("load config failed", e);
+      }
+    }
+
+    function saveConfigToLocal() {
+      const cfg = {
+        token: els.token.value.trim(),
+        owner: els.owner.value.trim(),
+        repo: els.repo.value.trim(),
+        branch: els.branch.value.trim(),
+        date: els.date.value,
+        tags: els.tags.value.trim(),
+      };
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg));
+        els.configStatus.textContent = "配置已保存到浏览器本地。";
+        els.configStatus.className = "status ok";
+      } catch (e) {
+        els.configStatus.textContent = "保存配置失败：" + e.message;
+        els.configStatus.className = "status error";
+      }
+    }
+
+    function simpleMarkdownToHtml(md) {
+      // 非严格实现，仅用于轻量预览
+      let html = md;
+      html = html.replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+      // 标题
+      html = html.replace(/^### (.*)$/gm, "<h3>$1</h3>");
+      html = html.replace(/^## (.*)$/gm, "<h2>$1</h2>");
+      html = html.replace(/^# (.*)$/gm, "<h1>$1</h1>");
+      // 行内代码
+      html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
+      // 简单段落
+      html = html.replace(/^(?!<h[1-3]>)(.+)$/gm, "<p>$1</p>");
+
+      return html;
+    }
+
+    function updatePreview() {
+      const raw = els.content.value;
+      if (!raw.trim()) {
+        els.preview.textContent = "开始输入内容后将在这里看到大致排版效果。";
+        return;
+      }
+      els.preview.innerHTML = simpleMarkdownToHtml(raw);
+    }
+
+    function buildFrontMatter() {
+      const title = els.title.value.trim();
+      const date = els.date.value || new Date().toISOString().slice(0, 10);
+      const tags = els.tags.value
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
+      const category = els.category.value.trim();
+
+      const lines = ["---"];
+      if (title) lines.push(`title: "${title.replace(/"/g, '\\"')}"`);
+      if (date) lines.push(`date: ${date}`);
+      if (category) lines.push(`category: "${category.replace(/"/g, '\\"')}"`);
+      if (tags.length) {
+        lines.push(
+          "tags: [" +
+            tags.map((t) => `"${t.replace(/"/g, '\\"')}"`).join(", ") +
+            "]"
+        );
+      }
+      lines.push("---", "");
+      return lines.join("\n");
+    }
+
+    function base64EncodeUnicode(str) {
+      // 处理多字节字符
+      return btoa(unescape(encodeURIComponent(str)));
+    }
+
+    async function githubRequest(path, options) {
+      const token = els.token.value.trim();
+      if (!token) {
+        throw new Error("请先填写 GitHub Token。");
+      }
+      const url = `https://api.github.com${path}`;
+      const res = await fetch(url, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `token ${token}`,
+          ...(options && options.headers),
+        },
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`GitHub API ${res.status}: ${text}`);
+      }
+      return res.json();
+    }
+
+    async function getFileSha(owner, repo, path, branch) {
+      try {
+        const data = await githubRequest(
+          `/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(
+            branch
+          )}`,
+          { method: "GET" }
+        );
+        return data.sha;
+      } catch (e) {
+        // 404 视为不存在
+        if (String(e.message).includes("404")) return null;
+        throw e;
+      }
+    }
+
+    async function upsertTextFile(owner, repo, branch, filePath, content, message) {
+      const sha = await getFileSha(owner, repo, filePath, branch);
+      const body = {
+        message,
+        content: base64EncodeUnicode(content),
+        branch,
+      };
+      if (sha) body.sha = sha;
+      return githubRequest(
+        `/repos/${owner}/${repo}/contents/${encodeURIComponent(filePath)}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(body),
+        }
+      );
+    }
+
+    function readFileAsBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result;
+          const commaIndex = result.indexOf(",");
+          if (commaIndex !== -1) {
+            resolve(result.slice(commaIndex + 1));
+          } else {
+            resolve(result);
+          }
+        };
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function upsertBinaryFile(owner, repo, branch, filePath, file, message) {
+      const sha = await getFileSha(owner, repo, filePath, branch);
+      const contentBase64 = await readFileAsBase64(file);
+      const body = {
+        message,
+        content: contentBase64,
+        branch,
+      };
+      if (sha) body.sha = sha;
+      return githubRequest(
+        `/repos/${owner}/${repo}/contents/${encodeURIComponent(filePath)}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(body),
+        }
+      );
+    }
+
+    function buildArticlePath() {
+      let slug = els.slug.value.trim();
+      const title = els.title.value.trim();
+      if (!slug) {
+        slug = title || "未命名文章";
+      }
+      if (!slug.endsWith(".md")) {
+        slug = slug + ".md";
+      }
+      return `blog/articles/${slug}`;
+    }
+
+    function collectImageTargets() {
+      return selectedImages.map((file) => {
+        const name = file.name;
+        const targetPath = `blog/images/${name}`;
+        return { file, name, targetPath };
+      });
+    }
+
+    async function handlePublish() {
+      const owner = els.owner.value.trim();
+      const repo = els.repo.value.trim();
+      const branch = els.branch.value.trim();
+      const title = els.title.value.trim();
+
+      if (!owner || !repo || !branch) {
+        els.publishStatus.textContent = "请先填写仓库 Owner、仓库名和分支。";
+        els.publishStatus.className = "status error";
+        return;
+      }
+      if (!title) {
+        els.publishStatus.textContent = "请填写文章标题。";
+        els.publishStatus.className = "status error";
+        return;
+      }
+
+      const frontMatter = buildFrontMatter();
+      const body = els.content.value || "";
+      const fullContent = frontMatter + "\n" + body;
+      const articlePath = buildArticlePath();
+      const images = collectImageTargets();
+
+      els.publishBtn.disabled = true;
+      els.publishStatus.textContent = "正在发布文章和上传图片，请稍候……";
+      els.publishStatus.className = "status";
+
+      try {
+        const message = `chore(blog): add ${title}`;
+        // 先发布文章
+        await upsertTextFile(owner, repo, branch, articlePath, fullContent, message);
+
+        // 再上传图片（若有）
+        for (const item of images) {
+          await upsertBinaryFile(owner, repo, branch, item.targetPath, item.file, message);
+        }
+
+        els.publishStatus.textContent = `发布成功：${articlePath}${
+          images.length ? `，上传图片 ${images.length} 张。` : "。"
+        }`;
+        els.publishStatus.className = "status ok";
+      } catch (e) {
+        console.error(e);
+        els.publishStatus.textContent = "发布失败：" + e.message;
+        els.publishStatus.className = "status error";
+      } finally {
+        els.publishBtn.disabled = false;
+      }
+    }
+
+    function handleImagesChange(e) {
+      selectedImages = Array.from(e.target.files || []);
+      els.imagesList.innerHTML = "";
+      if (!selectedImages.length) {
+        els.imagesList.textContent = "尚未选择图片。";
+        return;
+      }
+      selectedImages.forEach((file) => {
+        const div = document.createElement("div");
+        const displayName = file.name;
+        div.innerHTML = `${displayName} → <span class="code-inline">![](../images/${displayName})</span>`;
+        els.imagesList.appendChild(div);
+      });
+    }
+
+    function showFrontMatterPreview() {
+      const front = buildFrontMatter();
+      els.preview.textContent = front + "\n" + (els.content.value || "");
+    }
+
+    // 事件绑定
+    els.saveConfig.addEventListener("click", saveConfigToLocal);
+    els.content.addEventListener("input", () => {
+      updatePreview();
+    });
+    els.imageInput.addEventListener("change", handleImagesChange);
+    els.previewFrontmatter.addEventListener("click", showFrontMatterPreview);
+    els.publishBtn.addEventListener("click", handlePublish);
+
+    // 初始化
+    loadConfig();
+    updatePreview();
+    els.imagesList.textContent = "尚未选择图片。";
+  </script>
+</body>
+</html>
+
