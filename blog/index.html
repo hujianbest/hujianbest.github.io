@@ -290,55 +290,15 @@
     
     /* 代码块样式优化 */
     .markdown-section pre {
-      border-radius: 10px;
-      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.45);
+      border-radius: 8px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.18);
       overflow: auto;
-    }
-    
-    .markdown-section pre > code {
-      border-radius: 10px;
       font-size: 0.9rem;
     }
     
-    /* 首页封面优化 */
-    .cover-main {
-      text-align: left;
-      max-width: 640px;
-      padding: 2.8rem 3.2rem 3.2rem;
-      border-radius: var(--border-radius-lg);
-      background: radial-gradient(circle at top left, #ecfdf5 0, #ffffff 40%, #eef2ff 100%);
-      box-shadow: var(--shadow-soft);
-      border: 1px solid rgba(226, 232, 240, 0.9);
-    }
-    
-    .cover-main h1 {
-      font-size: 2.2rem;
-      margin-bottom: 0.75rem;
-      letter-spacing: 0.04em;
-    }
-    
-    .cover-main blockquote {
-      margin-top: 0.4rem;
-      margin-bottom: 1.1rem;
-      background: transparent;
-      box-shadow: none;
-    }
-    
-    .cover-main .buttons a {
-      border-radius: 999px !important;
-      padding-inline: 1.6rem !important;
-      padding-block: 0.7rem !important;
-      box-shadow: 0 14px 30px rgba(34, 197, 94, 0.6);
-      border: none !important;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      text-transform: none;
-    }
-    
-    .cover-main .buttons a:nth-child(2) {
-      background: #f9fafb !important;
-      color: #0f172a !important;
-      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
+    .markdown-section pre > code {
+      border-radius: 8px;
+      font-size: 0.9rem;
     }
     
     /* 页脚小提示 */
@@ -355,26 +315,9 @@
       color: #22c55e;
       text-decoration: none;
     }
-    
-    /* 进度条样式 */
-    .progress {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 0%;
-      height: 3px;
-      background: linear-gradient(90deg, #22c55e, #0ea5e9, #a855f7);
-      z-index: 9999;
-      box-shadow: 0 0 18px rgba(56, 189, 248, 0.7);
-      transform-origin: left center;
-      transition: width 0.2s ease-out;
-    }
   </style>
 </head>
 <body>
-  <!-- 阅读进度条 -->
-  <div class="progress"></div>
-  
   <div id="app"></div>
   <div class="footer">
     用心记录每一次成长 · Powered by Docsify &amp; GitHub Pages | <a href="/">返回首页</a>
@@ -388,9 +331,7 @@
       subMaxLevel: 3,
       auto2top: true,
       homepage: 'README.md',
-      coverpage: true,
-      onlyCover: false,
-      coverpageButton: '开始阅读',
+      coverpage: false,
       auto2top: true,
       basePath: '/blog/',
       search: {
@@ -443,14 +384,5 @@
   <script src="//cdn.jsdelivr.net/npm/prismjs/components/prism-java.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs/components/prism-json.min.js"></script>
   
-  <!-- 阅读进度条脚本 -->
-  <script>
-    window.onscroll = function() {
-      var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-      var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      var scrolled = (winScroll / height) * 100;
-      document.querySelector(".progress").style.width = scrolled + "%";
-    };
-  </script>
 </body>
 </html>
