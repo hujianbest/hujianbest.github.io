@@ -1,4 +1,4 @@
-* [返回主站](/)
+* <a href="/" onclick="window.location.href='/'">返回主站</a>
 * [博客首页](README.md)
 * [关于我](about.md)
 * 博客文章
