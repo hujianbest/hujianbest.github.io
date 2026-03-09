@@ -191,7 +191,7 @@
   <script src="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js"></script>
   <script>
     const STORAGE_KEY = "hjb_blog_admin_config_v1";
-    const DEFAULT_CONFIG = { owner: "hujianbest", repo: "hujianbest.github.io", branch: "main" };
+    const DEFAULT_CONFIG = { owner: "hujianbest", repo: "hujianbest.github.io", branch: "master" };
     let selectedImages = [];
     let easyMDE;
 
@@ -263,10 +263,23 @@
         els.branch.value = cfg.branch || DEFAULT_CONFIG.branch;
         els.date.value = cfg.date || new Date().toISOString().slice(0, 10);
         els.tags.value = cfg.tags || "";
+        if (cfg.title !== undefined) els.title.value = cfg.title;
+        if (cfg.slug !== undefined) els.slug.value = cfg.slug;
+        if (cfg.category !== undefined) els.category.value = cfg.category;
       } catch (e) { console.warn("load config failed", e); }
     }
     function saveConfigToLocal() {
-      const cfg = { token: els.token.value.trim(), owner: els.owner.value.trim(), repo: els.repo.value.trim(), branch: els.branch.value.trim(), date: els.date.value, tags: els.tags.value.trim() };
+      const cfg = {
+        token: els.token.value.trim(),
+        owner: els.owner.value.trim(),
+        repo: els.repo.value.trim(),
+        branch: els.branch.value.trim(),
+        date: els.date.value,
+        tags: els.tags.value.trim(),
+        title: els.title.value.trim(),
+        slug: els.slug.value.trim(),
+        category: els.category.value.trim()
+      };
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg));
         els.configStatus.textContent = "已保存到本机。";
@@ -302,9 +315,12 @@
       if (!res.ok) throw new Error("GitHub API " + res.status + ": " + (await res.text()));
       return res.json();
     }
+    function encodePath(path) {
+      return path.split("/").map(encodeURIComponent).join("/");
+    }
     async function getFileSha(owner, repo, path, branch) {
       try {
-        const data = await githubRequest("/repos/" + owner + "/" + repo + "/contents/" + encodeURIComponent(path) + "?ref=" + encodeURIComponent(branch), { method: "GET" });
+        const data = await githubRequest("/repos/" + owner + "/" + repo + "/contents/" + encodePath(path) + "?ref=" + encodeURIComponent(branch), { method: "GET" });
         return data.sha;
       } catch (e) { if (String(e.message).includes("404")) return null; throw e; }
     }
@@ -312,7 +328,7 @@
       const sha = await getFileSha(owner, repo, filePath, branch);
       const body = { message, content: base64EncodeUnicode(content), branch };
       if (sha) body.sha = sha;
-      return githubRequest("/repos/" + owner + "/" + repo + "/contents/" + encodeURIComponent(filePath), { method: "PUT", body: JSON.stringify(body) });
+      return githubRequest("/repos/" + owner + "/" + repo + "/contents/" + encodePath(filePath), { method: "PUT", body: JSON.stringify(body) });
     }
     function readFileAsBase64(file) {
       return new Promise((resolve, reject) => {
@@ -326,7 +342,16 @@
       const sha = await getFileSha(owner, repo, filePath, branch);
       const body = { message, content: await readFileAsBase64(file), branch };
       if (sha) body.sha = sha;
-      return githubRequest("/repos/" + owner + "/" + repo + "/contents/" + encodeURIComponent(filePath), { method: "PUT", body: JSON.stringify(body) });
+      return githubRequest("/repos/" + owner + "/" + repo + "/contents/" + encodePath(filePath), { method: "PUT", body: JSON.stringify(body) });
+    }
+    async function getFileContent(owner, repo, filePath, branch) {
+      const data = await githubRequest("/repos/" + owner + "/" + repo + "/contents/" + encodePath(filePath) + "?ref=" + encodeURIComponent(branch), { method: "GET" });
+      if (data.encoding === "base64" && data.content) {
+        try {
+          return decodeURIComponent(escape(atob(data.content.replace(/\s/g, ""))));
+        } catch (e) { throw new Error("解码文件内容失败"); }
+      }
+      throw new Error("无法读取文件内容");
     }
     function buildArticlePath() {
       let slug = els.slug.value.trim();
@@ -334,6 +359,10 @@
       if (!slug) slug = title || "未命名文章";
       if (!slug.endsWith(".md")) slug += ".md";
       return "blog/articles/" + slug;
+    }
+    function articlePathToLinkSlug(articlePath) {
+      const base = articlePath.replace(/^blog\/articles\//i, "").replace(/\.md$/i, "");
+      return base;
     }
     function collectImageTargets() { return selectedImages.map((file) => ({ file, name: file.name, targetPath: "blog/images/" + file.name })); }
 
@@ -345,7 +374,9 @@
       const body = easyMDE.value() || "";
       const fullContent = frontMatter + body;
       const articlePath = buildArticlePath();
+      const linkSlug = articlePathToLinkSlug(articlePath);
       const images = collectImageTargets();
+      const date = els.date.value || new Date().toISOString().slice(0, 10);
       els.publishBtn.disabled = true;
       els.publishStatus.textContent = "正在发布…";
       els.publishStatus.className = "status";
@@ -355,6 +386,40 @@
         for (const item of images) await upsertBinaryFile(owner, repo, branch, item.targetPath, item.file, message);
         els.publishStatus.textContent = "发布成功：" + articlePath + (images.length ? "，上传 " + images.length + " 张图。" : "。");
         els.publishStatus.className = "status ok";
+
+        try {
+          const sidebarPath = "blog/_sidebar.md";
+          let sidebarRaw = await getFileContent(owner, repo, sidebarPath, branch);
+          const sidebarLines = sidebarRaw.split("\n");
+          let insertIdx = sidebarLines.findIndex((l) => l.trim() === "* 博客文章" || l.includes("博客文章"));
+          if (insertIdx === -1) insertIdx = sidebarLines.length;
+          let lastChild = insertIdx;
+          for (let i = insertIdx + 1; i < sidebarLines.length; i++) {
+            if (sidebarLines[i].startsWith("  * ")) lastChild = i;
+            else if (sidebarLines[i].startsWith("* ") && !sidebarLines[i].startsWith("*  ")) break;
+          }
+          const newLine = "  * [" + title + "](articles/" + linkSlug + ")";
+          if (!sidebarRaw.includes("](articles/" + linkSlug + ")")) {
+            sidebarLines.splice(lastChild + 1, 0, newLine);
+            await upsertTextFile(owner, repo, branch, sidebarPath, sidebarLines.join("\n"), "chore(blog): sidebar add " + title);
+            els.publishStatus.textContent += " 已更新侧栏。";
+          }
+        } catch (e) { console.warn("更新侧栏失败", e); els.publishStatus.textContent += " 侧栏未更新。"; }
+
+        try {
+          const readmePath = "blog/README.md";
+          let readmeRaw = await getFileContent(owner, repo, readmePath, branch);
+          const recentHeading = readmeRaw.match(/\n(##\s*[^\n]*最近文章[^\n]*)\n/);
+          if (recentHeading) {
+            const idx = readmeRaw.indexOf(recentHeading[0]) + recentHeading[0].length;
+            const block = "\n### [" + title + "](articles/" + linkSlug + ")\n发布日期：" + date + "\n\n";
+            if (!readmeRaw.includes("](articles/" + linkSlug + ")")) {
+              readmeRaw = readmeRaw.slice(0, idx) + block + readmeRaw.slice(idx);
+              await upsertTextFile(owner, repo, branch, readmePath, readmeRaw, "chore(blog): recent add " + title);
+              els.publishStatus.textContent += " 已更新博客首页。";
+            }
+          }
+        } catch (e) { console.warn("更新博客首页失败", e); els.publishStatus.textContent += " 首页未更新。"; }
       } catch (e) {
         console.error(e);
         els.publishStatus.textContent = "发布失败：" + e.message;
