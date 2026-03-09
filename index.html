@@ -399,12 +399,12 @@
                 const res = await fetch('/blog/README.md');
                 if (!res.ok) throw new Error('README not found');
                 const text = await res.text();
-                const lines = text.split('\\n');
+                const lines = text.split('\n');
                 const posts = [];
                 for (let i = 0; i < lines.length; i++) {
                     const line = lines[i].trim();
                     if (line.startsWith('### [')) {
-                        const match = line.match(/^### \\[(.+?)\\]\\((.+?)\\)/);
+                        const match = line.match(/^### \[(.+?)\]\((.+?)\)/);
                         if (match) {
                             const title = match[1];
                             const path = match[2];
@@ -418,7 +418,7 @@
                                 title,
                                 path,
                                 date,
-                                link: '/blog/#/' + path.replace(/^\\.\\//, '')
+                                link: '/blog/#/' + path.replace(/^\.\//, '')
                             });
                         }
                     }
