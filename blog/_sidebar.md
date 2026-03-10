@@ -9,3 +9,4 @@
   * [使用Superpowers自动开发需求规范指导（详细版）](articles/使用Superpowers自动开发需求规范指导（详细版）)
   * [SDD+TDD流程指导文档](articles/SDD+TDD流程指导文档)
   * [OpenCode TDD实战指南](articles/OpenCode-TDD实战指南)
+  * [OpenCode SDD实战指南](articles/OpenCode-SDD实战指南)
