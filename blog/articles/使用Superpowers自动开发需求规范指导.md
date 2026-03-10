@@ -1,10 +1,3 @@
----
-title: "使用Superpowers自动开发需求规范指导"
-date: 2026-03-10
-category: "技术"
-tags: ["AI助手", "Cursor", "Superpowers", "需求分析", "开发流程"]
----
-
 # 使用Superpowers自动开发需求规范指导
 
 > 面向日常使用 Cursor / Superpowers 的开发者，帮助你把「一句话想法」稳定收敛为「可执行、可验收的规范需求」，并通过一套标准流程交给 AI 自动开发。
